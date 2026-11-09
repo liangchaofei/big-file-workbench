@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="用于验证大文件分片上传接口的轻量测试工作台。"
+    />
+    <title>大文件上传测试工作台</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <main class="workbench">
+      <header class="page-header">
+        <div class="brand-mark" aria-hidden="true">B</div>
+        <div>
+          <p class="eyebrow">UPLOAD LAB</p>
+          <h1>大文件上传测试工作台</h1>
+          <p class="subtitle">配置分片参数，观察上传进度与服务端响应</p>
+        </div>
+      </header>
+
+      <section class="panel setup-panel" aria-labelledby="setup-title">
+        <div class="section-heading">
+          <div>
+            <p class="step-label">01 / 配置</p>
+            <h2 id="setup-title">上传参数</h2>
+          </div>
+          <span class="method-badge">POST · multipart/form-data</span>
+        </div>
+
+        <div class="settings-grid">
+          <label class="field field-wide">
+            <span>上传接口地址</span>
+            <input
+              id="endpoint"
+              type="url"
+              placeholder="https://api.example.com/upload"
+              autocomplete="url"
+              required
+            />
+            <small>浏览器会直接向此地址发送请求，请确认服务端已允许跨域访问。</small>
+          </label>
+          <label class="field">
+            <span>分片大小</span>
+            <span class="input-suffix">
+              <input id="chunk-size" type="number" min="1" max="1024" value="5" />
+              <span>MiB</span>
+            </span>
+          </label>
+          <label class="field">
+            <span>并发数</span>
+            <span class="input-suffix">
+              <input id="concurrency" type="number" min="1" max="16" value="3" />
+              <span>个</span>
+            </span>
+          </label>
+          <label class="field">
+            <span>文件字段名</span>
+            <input id="file-field" type="text" value="file" maxlength="80" />
+          </label>
+        </div>
+
+        <button id="select-file" class="dropzone" type="button">
+          <span class="upload-icon" aria-hidden="true">↑</span>
+          <span class="dropzone-copy">
+            <strong>选择文件或拖放到这里</strong>
+            <span>支持任意文件类型，文件仅在上传时发送到所配置的接口</span>
+          </span>
+          <span class="browse-label">浏览文件</span>
+        </button>
+        <input id="file-input" class="visually-hidden" type="file" />
+
+        <div id="selected-file" class="selected-file" hidden>
+          <span class="file-icon" aria-hidden="true">▤</span>
+          <span class="file-details">
+            <strong id="file-name"></strong>
+            <span id="file-meta"></span>
+          </span>
+          <button id="remove-file" class="icon-button" type="button" aria-label="移除文件">×</button>
+        </div>
+
+        <div class="actions">
+          <button id="start-upload" class="primary-button" type="button" disabled>
+            开始上传
+          </button>
+          <button id="cancel-upload" class="secondary-button" type="button" hidden>
+            取消上传
+          </button>
+          <span id="form-message" class="form-message" role="status" aria-live="polite"></span>
+        </div>
+      </section>
+
+      <section class="panel progress-panel" aria-labelledby="progress-title">
+        <div class="section-heading">
+          <div>
+            <p class="step-label">02 / 进度</p>
+            <h2 id="progress-title">上传状态</h2>
+          </div>
+          <span id="upload-status" class="status-badge status-idle">等待上传</span>
+        </div>
+        <div class="progress-summary">
+          <strong id="progress-percent">0%</strong>
+          <span id="progress-detail">选择文件并配置接口后开始</span>
+        </div>
+        <progress id="progress-bar" max="100" value="0" aria-label="上传进度"></progress>
+        <div class="progress-stats">
+          <span><strong id="sent-size">0 B</strong><small>已发送</small></span>
+          <span><strong id="chunk-count">0 / 0</strong><small>已完成分片</small></span>
+          <span><strong id="elapsed-time">0 秒</strong><small>耗时</small></span>
+        </div>
+      </section>
+
+      <section class="panel chunks-panel" aria-labelledby="chunks-title">
+        <div class="section-heading">
+          <div>
+            <p class="step-label">03 / 请求明细</p>
+            <h2 id="chunks-title">分片记录</h2>
+          </div>
+          <span id="chunk-total" class="muted-label">尚无分片</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">分片</th>
+                <th scope="col">大小</th>
+                <th scope="col">状态</th>
+                <th scope="col">HTTP</th>
+                <th scope="col">服务端响应</th>
+              </tr>
+            </thead>
+            <tbody id="chunk-list">
+              <tr class="empty-row">
+                <td colspan="5">上传开始后，每个分片的请求结果会显示在这里。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer>
+        <span>分片上传测试工具</span>
+        <span>文件不会被此页面保存</span>
+      </footer>
+    </main>
+  </body>
+</html>
