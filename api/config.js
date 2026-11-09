@@ -1,0 +1,2 @@
+import {cloudLimit,apiError} from '../server/cloud-auth.js';
+export default function handler(req,res){res.setHeader('Cache-Control','no-store');if(req.method!=='GET')return res.status(405).json({error:'Method not allowed'});try{return res.status(200).json({storage:'vercel-blob',maxFileSize:cloudLimit(),maxChunkSize:64*1024**2,minChunkSize:8*1024**2,requiresPassword:true,configured:Boolean(process.env.BLOB_READ_WRITE_TOKEN&&process.env.UPLOAD_PASSWORD),access:'private'});}catch(e){return apiError(res,e);}}

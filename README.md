@@ -1,4 +1,4 @@
-# Upload Lab / 大文件上传实验室
+# big-file-workbench / 大文件上传测试工作台
 
 React + Vite 前端，Node.js 原生 HTTP 后端。依赖已安装。
 
@@ -85,3 +85,22 @@ npm run test:browser
 | GET | `/api/files/:id` | 下载文件 |
 
 该项目面向本地单进程实验，服务绑定 127.0.0.1，无账号系统。
+
+
+## Vercel 云端部署（私有 Blob）
+
+云端与本地使用不同存储适配器：本地仍是 Node 流式落盘；Vercel 使用浏览器直传 Blob，Vercel Functions 只做口令校验、签发短期上传凭证、查询大小和签发下载 URL，不接收文件二进制。
+
+1. 将 GitHub 仓库导入 Vercel，Framework 选择 Vite（配置已包含在 vercel.json）。
+2. 在项目 Storage 中创建 **Private Blob**，连接 Production 和 Preview，并勾选添加 read-write token；确保环境变量名为 `BLOB_READ_WRITE_TOKEN`。
+3. 在项目 Environment Variables 设置 `UPLOAD_PASSWORD`，作为网页上的上传口令。不要将令牌或口令放入 `VITE_` 变量或提交到 Git。
+4. 可选 `MAX_FILE_SIZE`，云端默认 1 GiB，支持当前 500 MiB 测试 PDF。
+5. 重新部署后输入口令即可上传。
+
+云端分片可选 8/16/32/64 MiB，1–6 并发；通过 SDK 直接发送到 Blob。断点保存在当前标签页的 sessionStorage，刷新后重新选择同一文件及分片大小可恢复，24 小时内有效；关闭标签页后不能恢复。整文件模式不做断点恢复。完成后再次上传会创建新对象，原有对象仍保留；请在 Blob 控制台清理测试产物。
+
+云端只核对存储文件大小，SHA-256 是 Worker 在本地计算的源文件摘要，**不代表已进行云端 SHA-256 比对**。本地模式仍提供完整哈希比对。私有文件下载使用 1 小时有效签名 URL，点击历史记录会用当前口令重新签发；导出的 JSON 中签名 URL 也有这个有效期。
+
+上传口令只用于该测试工作台的访问控制，保存在当前标签页 sessionStorage。不要把口令分享给无关人员。Blob 的存储和传输消耗你自己的 Vercel 配额。
+
+忽略提交和部署的目录：`test-files/`、`data/`、`work/`、`node_modules/`、`.env*`（仅 `.env.example` 会提交）。

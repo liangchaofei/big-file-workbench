@@ -5,3 +5,6 @@ work/
 *.log
 test-files/
 browser-test-report.json
+.vercel/
+.env*
+!.env.example
