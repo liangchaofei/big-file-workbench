@@ -1,0 +1,26 @@
+{
+  "name": "file-upload-lab",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n api,web \"node server/index.js\" \"vite --host 127.0.0.1\"",
+    "build": "vite build",
+    "start": "node server/index.js",
+    "test": "node --test tests/*.test.js",
+    "test:browser": "node scripts/browser-test.js"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "hash-wasm": "^4.12.0"
+  },
+  "devDependencies": {
+    "vite": "^7.0.0",
+    "concurrently": "^9.0.0",
+    "@playwright/test": "^1.56.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}
